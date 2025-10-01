@@ -1,12 +1,13 @@
 import { RotateCcw } from 'lucide-react'
+import { toast } from 'sonner'
+import { isAxiosError } from 'axios'
 import type { ComponentProps, DetailedHTMLProps, FormHTMLAttributes } from 'react'
 import { Input } from '@/shared/components/ui/input.tsx'
 import { useUploadFormContext } from '@/features/upload/model'
 import { Button } from '@/shared/components/ui/button.tsx'
 import { cn } from '@/shared/lib/utils.ts'
 import { isAlreadyExistsError, isApiError, uploadApi } from '@/shared/api'
-import { toast } from 'sonner'
-import { isAxiosError } from 'axios'
+import { filesStore } from '@/entities/files-storage'
 
 export const NameInput = ({
   className,
@@ -58,9 +59,13 @@ const upload = async (name: string, file: File, overwrite: boolean, signal: Abor
 
 const handleRequest = (name: string, file: File, overwrite: boolean) => {
   const ctrl = new AbortController()
+  const { addFile } = filesStore
   toast.promise(upload(name, file, overwrite, ctrl.signal), {
     loading: 'Uploading...',
-    success: fileName => ({ message: `${fileName} uploaded successfully`, action: undefined }),
+    success: fileName => {
+      addFile({ name: fileName, size: file.size, type: file.type, lastModified: file.lastModified })
+      return { message: `${fileName} uploaded successfully`, action: undefined }
+    },
     error: (error: unknown) => {
       if (!isAxiosError(error)) {
         return { message: 'An error occurred', action: undefined }
