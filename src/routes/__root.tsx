@@ -20,7 +20,7 @@ export const Route = createRootRoute({
           },
         ]}
       />
-      <Toaster position={'top-center'} closeButton richColors />
+      <Toaster position={'bottom-right'} closeButton richColors />
     </>
   ),
 })

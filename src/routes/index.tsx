@@ -7,6 +7,7 @@ import { SelectFileButton, SelectFileProvider, useSelectFileContext } from '@/fe
 import { cn } from '@/shared/lib/utils.ts'
 import { filesStore } from '@/entities/files-storage'
 import { DownloadButton } from '@/features/download'
+import { ScrollArea } from '@/shared/components/ui/scroll-area.tsx'
 
 export const Route = createFileRoute('/')({
   component: App,
@@ -21,7 +22,7 @@ const formatFileSize = (bytes: number): string => {
 
 function App() {
   return (
-    <div className={'w-full h-full flex gap-6 items-center'}>
+    <div className={'w-full h-full flex gap-6 justify-center items-start py-10'}>
       <SelectFileProvider>
         <UploadCard />
       </SelectFileProvider>
@@ -34,35 +35,39 @@ function App() {
 const FilesListCard = observer(() => {
   const { files } = filesStore
   return (
-    <Card className="w-full max-w-sm h-fit">
+    <Card className="w-full max-w-sm h-full flex flex-col gap-2 overflow-hidden">
       <CardHeader>
         <CardTitle>Uploaded files</CardTitle>
         {files.length === 0 && <CardDescription>There are no uploaded files.</CardDescription>}
       </CardHeader>
-      <CardContent className={'flex flex-col'}>
-        {files.map(file => (
-          <Card key={file.name} className="w-full h-fit">
-            <CardHeader>
-              <CardTitle>{file.name}</CardTitle>
-              <div className={'flex gap-1 flex-wrap'}>
-                {file.size && <Badge>{formatFileSize(file.size)}</Badge>}
-                {file.type && <Badge variant={'secondary'}>{file.type}</Badge>}
-                {file.lastModified && (
-                  <Badge variant={'secondary'}>
-                    {new Date(file.lastModified).toLocaleDateString('en', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                    })}
-                  </Badge>
-                )}
-              </div>
-            </CardHeader>
-            <CardAction>
-              <DownloadButton fileName={file.name} />
-            </CardAction>
-          </Card>
-        ))}
+      <CardContent className={'h-full'}>
+        <ScrollArea className={'pr-3 h-full'}>
+          <div className={'flex flex-col gap-2 pb-6'}>
+            {files.map(file => (
+              <Card key={file.name} className="w-full h-fit">
+                <CardHeader>
+                  <CardTitle className={'truncate'}>{file.name}</CardTitle>
+                  <div className={'flex gap-1 flex-wrap'}>
+                    {file.size && <Badge>{formatFileSize(file.size)}</Badge>}
+                    {file.type && <Badge variant={'secondary'}>{file.type}</Badge>}
+                    {file.lastModified && (
+                      <Badge variant={'secondary'}>
+                        {new Date(file.lastModified).toLocaleDateString('en', {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric',
+                        })}
+                      </Badge>
+                    )}
+                  </div>
+                  <CardAction>
+                    <DownloadButton fileName={file.name} />
+                  </CardAction>
+                </CardHeader>
+              </Card>
+            ))}
+          </div>
+        </ScrollArea>
       </CardContent>
     </Card>
   )
