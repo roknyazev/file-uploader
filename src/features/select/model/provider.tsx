@@ -1,12 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
-import type { Dispatch, PropsWithChildren, SetStateAction } from 'react'
+import type { PropsWithChildren } from 'react'
+import type { SelectFileContext } from '@/features/select/model/types.ts'
 import { createStrictContext } from '@/shared/hooks/strictContext.ts'
-
-export type SelectFileContext = {
-  file: File | null
-  setFile: Dispatch<SetStateAction<File | null>>
-  isDragging: boolean
-}
 
 const [useSelectFileContext, Provider] = createStrictContext<SelectFileContext>('UploadForm')
 
