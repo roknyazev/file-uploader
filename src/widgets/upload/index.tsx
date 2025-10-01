@@ -18,7 +18,7 @@ const DnDOverlay = ({ isDragging }: { isDragging: boolean }) => {
 }
 
 export const UploadCard = () => {
-  const { file, isDragging } = useSelectFileContext()
+  const { file, isDragging, setFile } = useSelectFileContext()
   return (
     <Card className="w-full max-w-sm">
       <DnDOverlay isDragging={isDragging} />
@@ -34,7 +34,7 @@ export const UploadCard = () => {
         <CardContent className={'flex flex-col gap-2'}>
           <CardDescription className={'truncate'}>{file.name}</CardDescription>
           <UploadFormProvider file={file}>
-            <UploadForm className={'flex gap-2 justify-between w-full'}>
+            <UploadForm className={'flex gap-2 justify-between w-full'} onSubmit={() => setFile(null)}>
               <NameInput className={'grow'} />
               <ResetButton />
               <SubmitButton />

@@ -48,9 +48,10 @@ export const ResetButton = (
   )
 }
 
-export const UploadForm = (
-  props: Omit<DetailedHTMLProps<FormHTMLAttributes<HTMLFormElement>, HTMLFormElement>, 'onSubmit'>,
-) => {
+export const UploadForm = ({
+  onSubmit,
+  ...rest
+}: DetailedHTMLProps<FormHTMLAttributes<HTMLFormElement>, HTMLFormElement>) => {
   const {
     data: { name, file },
   } = useUploadFormContext()
@@ -58,9 +59,10 @@ export const UploadForm = (
     <form
       onSubmit={e => {
         e.preventDefault()
+        onSubmit && onSubmit(e)
         uploadAction(name, file, false)
       }}
-      {...props}
+      {...rest}
     />
   )
 }
