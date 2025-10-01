@@ -1,9 +1,11 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { observer } from 'mobx-react-lite'
 import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/components/ui/card.tsx'
 import { Badge } from '@/shared/components/ui/badge.tsx'
 import { NameInput, ResetButton, SubmitButton, UploadForm, UploadFormProvider } from '@/features/upload'
 import { SelectFileButton, SelectFileProvider, useSelectFileContext } from '@/features/select'
 import { cn } from '@/shared/lib/utils.ts'
+import { filesStore } from '@/entities/files-storage'
 
 export const Route = createFileRoute('/')({
   component: App,
@@ -23,15 +25,44 @@ function App() {
         <UploadCard />
       </SelectFileProvider>
 
-      <Card className="w-full max-w-sm h-fit">
-        <CardHeader>
-          <CardTitle>Uploaded files</CardTitle>
-          <CardDescription>There are no uploaded files.</CardDescription>
-        </CardHeader>
-      </Card>
+      <FilesListCard />
     </div>
   )
 }
+
+const FilesListCard = observer(() => {
+  const { files } = filesStore
+  return (
+    <Card className="w-full max-w-sm h-fit">
+      <CardHeader>
+        <CardTitle>Uploaded files</CardTitle>
+        {files.length === 0 && <CardDescription>There are no uploaded files.</CardDescription>}
+      </CardHeader>
+      <CardContent className={'flex flex-col'}>
+        {files.map(file => (
+          <Card key={file.name} className="w-full h-fit">
+            <CardHeader>
+              <CardTitle>{file.name}</CardTitle>
+              <div className={'flex gap-1 flex-wrap'}>
+                {file.size && <Badge>{formatFileSize(file.size)}</Badge>}
+                {file.type && <Badge variant={'secondary'}>{file.type}</Badge>}
+                {file.lastModified && (
+                  <Badge variant={'secondary'}>
+                    {new Date(file.lastModified).toLocaleDateString('en', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                    })}
+                  </Badge>
+                )}
+              </div>
+            </CardHeader>
+          </Card>
+        ))}
+      </CardContent>
+    </Card>
+  )
+})
 
 const DnDOverlay = ({ isDragging }: { isDragging: boolean }) => {
   return (
