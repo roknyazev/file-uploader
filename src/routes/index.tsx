@@ -1,9 +1,9 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useRef, useState } from 'react'
 import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/components/ui/card.tsx'
-import { Button } from '@/shared/components/ui/button.tsx'
 import { Badge } from '@/shared/components/ui/badge.tsx'
 import { NameInput, ResetButton, SubmitButton, UploadForm, UploadFormProvider } from '@/features/upload'
+import { SelectFileButton, SelectFileProvider, useSelectFileContext } from '@/features/select'
+import { cn } from '@/shared/lib/utils.ts'
 
 export const Route = createFileRoute('/')({
   component: App,
@@ -17,54 +17,12 @@ const formatFileSize = (bytes: number): string => {
 }
 
 function App() {
-  const fileInputRef = useRef<HTMLInputElement>(null)
-  const [selectedFile, setSelectedFile] = useState<File | null>(null)
-
   return (
     <div className={'w-full h-full flex gap-6 items-center'}>
-      <Card className="w-full max-w-sm">
-        <CardHeader>
-          <CardTitle>Upload file</CardTitle>
-          <CardDescription>Select or drag and drop a file to upload.</CardDescription>
-          <CardAction>
-            <Button variant={selectedFile ? 'outline' : 'default'} onClick={() => fileInputRef.current?.click()}>
-              Select file
-            </Button>
-            <input
-              multiple={false}
-              ref={fileInputRef}
-              type={'file'}
-              className={'hidden'}
-              onChange={e => setSelectedFile(e.target.files?.[0] || null)}
-            />
-          </CardAction>
-        </CardHeader>
-        {selectedFile && (
-          <CardContent className={'flex flex-col gap-2'}>
-            <UploadFormProvider file={selectedFile}>
-              <UploadForm className={'flex gap-2'}>
-                <NameInput />
-                <ResetButton />
-                <SubmitButton />
-              </UploadForm>
-            </UploadFormProvider>
+      <SelectFileProvider>
+        <UploadCard />
+      </SelectFileProvider>
 
-            <div className={'flex gap-1 flex-wrap'}>
-              {selectedFile.size && <Badge>{formatFileSize(selectedFile.size)}</Badge>}
-              {selectedFile.type && <Badge variant={'secondary'}>{selectedFile.type}</Badge>}
-              {selectedFile.lastModified && (
-                <Badge variant={'secondary'}>
-                  {new Date(selectedFile.lastModified).toLocaleDateString('en', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                  })}
-                </Badge>
-              )}
-            </div>
-          </CardContent>
-        )}
-      </Card>
       <Card className="w-full max-w-sm h-fit">
         <CardHeader>
           <CardTitle>Uploaded files</CardTitle>
@@ -72,5 +30,61 @@ function App() {
         </CardHeader>
       </Card>
     </div>
+  )
+}
+
+const DnDOverlay = ({ isDragging }: { isDragging: boolean }) => {
+  return (
+    <div
+      className={cn(
+        'z-10 fixed inset-0 w-screen h-screen bg-black/50 p-4 transition-opacity duration-200 ease-out',
+        isDragging ? 'opacity-100' : 'opacity-0 pointer-events-none',
+      )}
+    >
+      <div className={`w-full h-full border-dashed border-4 border-primary/50 rounded-2xl`} />
+    </div>
+  )
+}
+
+const UploadCard = () => {
+  const { file, isDragging } = useSelectFileContext()
+  return (
+    <Card className="w-full max-w-sm">
+      <DnDOverlay isDragging={isDragging} />
+
+      <CardHeader>
+        <CardTitle>Upload file</CardTitle>
+        <CardDescription>Select or drag and drop a file to upload.</CardDescription>
+        <CardAction>
+          <SelectFileButton />
+        </CardAction>
+      </CardHeader>
+      {file && (
+        <CardContent className={'flex flex-col gap-2'}>
+          <CardDescription className={'truncate'}>{file.name}</CardDescription>
+          <UploadFormProvider file={file}>
+            <UploadForm className={'flex gap-2'}>
+              <NameInput />
+              <ResetButton />
+              <SubmitButton />
+            </UploadForm>
+          </UploadFormProvider>
+
+          <div className={'flex gap-1 flex-wrap'}>
+            {file.size && <Badge>{formatFileSize(file.size)}</Badge>}
+            {file.type && <Badge variant={'secondary'}>{file.type}</Badge>}
+            {file.lastModified && (
+              <Badge variant={'secondary'}>
+                {new Date(file.lastModified).toLocaleDateString('en', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+                })}
+              </Badge>
+            )}
+          </div>
+        </CardContent>
+      )}
+    </Card>
   )
 }
