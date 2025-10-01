@@ -103,8 +103,8 @@ const UploadCard = () => {
         <CardContent className={'flex flex-col gap-2'}>
           <CardDescription className={'truncate'}>{file.name}</CardDescription>
           <UploadFormProvider file={file}>
-            <UploadForm className={'flex gap-2'}>
-              <NameInput />
+            <UploadForm className={'flex gap-2 justify-between w-full'}>
+              <NameInput className={'grow'} />
               <ResetButton />
               <SubmitButton />
             </UploadForm>
