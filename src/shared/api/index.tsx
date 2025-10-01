@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { uploadApi as uploadApiFactory } from './http'
+import { downloadApi as downloadApiFactory, uploadApi as uploadApiFactory } from './http'
 
 const client = axios.create({
   baseURL: import.meta.env.VITE_UPLOAD_BASE_URL,
@@ -9,4 +9,5 @@ const client = axios.create({
 })
 
 export const uploadApi = uploadApiFactory(client)
+export const downloadApi = downloadApiFactory(client)
 export { isApiError, isAlreadyExistsError } from './http'

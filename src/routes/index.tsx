@@ -6,6 +6,7 @@ import { NameInput, ResetButton, SubmitButton, UploadForm, UploadFormProvider } 
 import { SelectFileButton, SelectFileProvider, useSelectFileContext } from '@/features/select'
 import { cn } from '@/shared/lib/utils.ts'
 import { filesStore } from '@/entities/files-storage'
+import { DownloadButton } from '@/features/download'
 
 export const Route = createFileRoute('/')({
   component: App,
@@ -57,6 +58,9 @@ const FilesListCard = observer(() => {
                 )}
               </div>
             </CardHeader>
+            <CardAction>
+              <DownloadButton fileName={file.name} />
+            </CardAction>
           </Card>
         ))}
       </CardContent>
