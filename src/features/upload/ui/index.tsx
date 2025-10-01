@@ -4,6 +4,7 @@ import { Input } from '@/shared/components/ui/input.tsx'
 import { useUploadFormContext } from '@/features/upload/model'
 import { Button } from '@/shared/components/ui/button.tsx'
 import { cn } from '@/shared/lib/utils.ts'
+import { uploadApi } from '@/shared/api'
 
 export const NameInput = ({
   className,
@@ -50,12 +51,14 @@ export const ResetButton = (
 export const UploadForm = (
   props: Omit<DetailedHTMLProps<FormHTMLAttributes<HTMLFormElement>, HTMLFormElement>, 'onSubmit'>,
 ) => {
-  const { data } = useUploadFormContext()
+  const {
+    data: { name, file },
+  } = useUploadFormContext()
   return (
     <form
       onSubmit={e => {
         e.preventDefault()
-        console.log(data)
+        uploadApi.uploadUrl(name, false).then(res => uploadApi.upload(res.href, file))
       }}
       {...props}
     />
